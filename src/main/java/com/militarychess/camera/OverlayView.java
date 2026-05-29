@@ -21,7 +21,7 @@ public class OverlayView extends View {
     private static final String TAG = "OverlayView";
 
     private Bitmap overlayBitmap;
-    private final Paint paint;
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private float alpha = 0.3f;
 
     public OverlayView(Context context) {
@@ -30,7 +30,6 @@ public class OverlayView extends View {
     }
 
     private void init() {
-        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setFilterBitmap(true);
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
