@@ -225,7 +225,7 @@ public class CameraActivity extends AppCompatActivity {
     private void openCameraInternal(int width, int height) {
         try {
             CameraManager manager = (CameraManager) getSystemService(CAMERA_SERVICE);
-            final String cameraId = null;
+            String cameraId = null;
 
             // 选后置摄像头
             for (String id : manager.getCameraIdList()) {
@@ -298,11 +298,12 @@ public class CameraActivity extends AppCompatActivity {
 
             // 打开相机
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                manager.openCamera(cameraId, new CameraDevice.StateCallback() {
+                final String openedCameraId = cameraId;
+                manager.openCamera(openedCameraId, new CameraDevice.StateCallback() {
                     @Override
                     public void onOpened(@NonNull CameraDevice device) {
                         cameraDevice = device;
-                        Log.d(TAG, "Camera opened: " + cameraId);
+                        Log.d(TAG, "Camera opened: " + openedCameraId);
                         startPreview();
                     }
 
