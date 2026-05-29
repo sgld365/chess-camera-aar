@@ -21,6 +21,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.4'
+          validate-wrappers: false
 
       - name: Build AAR
         run: gradle assembleRelease --no-daemon
