@@ -20,6 +20,9 @@ android {
         main {
             java.srcDirs = ['src/main/java']
             manifest.srcFile 'src/main/AndroidManifest.xml'
+            java {
+                exclude 'io/dcloud/**'
+            }
         }
     }
 }
