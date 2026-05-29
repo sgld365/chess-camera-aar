@@ -20,9 +20,6 @@ android {
         main {
             java.srcDirs = ['src/main/java']
             manifest.srcFile 'src/main/AndroidManifest.xml'
-            java {
-                exclude 'io/dcloud/**'
-            }
         }
     }
 }
@@ -30,4 +27,29 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.alibaba:fastjson:1.2.83'
+}
+
+// 构建后从 AAR 中删除 DCloud 桩类，避免与 uni-app SDK 冲突
+afterEvaluate {
+    android.libraryVariants.all { variant ->
+        def aarTask = tasks.findByName("bundle${variant.name.capitalize()}Aar")
+        if (aarTask) {
+            aarTask.doLast {
+                def aar = aarTask.archiveFile.get().asFile
+                def tmp = file("${buildDir}/tmp/aar-clean-${variant.name}")
+                delete tmp
+                copy {
+                    from zipTree(aar)
+                    into tmp
+                    exclude '**/io/dcloud/**'
+                }
+                delete aar
+                ant.zip(destfile: aar) {
+                    fileset(dir: tmp)
+                }
+                delete tmp
+                println "Cleaned DCloud stubs from AAR: ${aar.name}"
+            }
+        }
+    }
 }
