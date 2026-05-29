@@ -17,15 +17,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
+      - name: Setup Gradle 8.4
         uses: gradle/actions/setup-gradle@v4
         with:
-          validate-wrappers: false
+          gradle-version: '8.4'
 
       - name: Build AAR
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+        run: gradle assembleRelease --no-daemon
 
       - name: Upload AAR
         uses: actions/upload-artifact@v4
