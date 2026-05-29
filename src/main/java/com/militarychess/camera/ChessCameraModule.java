@@ -51,6 +51,16 @@ public class ChessCameraModule extends UniModule {
         intent.putExtra("overlay_alpha", (float) alpha);
         if (savePath != null) intent.putExtra("save_path", savePath);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mUniSDKInstance.getContext().startActivity(intent);
+        try {
+            mUniSDKInstance.getContext().startActivity(intent);
+            Log.d(TAG, "startActivity succeeded");
+        } catch (Exception e) {
+            Log.e(TAG, "startActivity failed: " + e.getMessage(), e);
+            JSONObject err = new JSONObject();
+            err.put("code", -1);
+            err.put("message", "启动相机失败: " + e.getMessage());
+            sCallback.invoke(err);
+            sCallback = null;
+        }
     }
 }
