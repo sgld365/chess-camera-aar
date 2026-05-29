@@ -24,7 +24,7 @@ jobs:
           validate-wrappers: false
 
       - name: Build AAR
-        run: gradle assembleRelease --no-daemon
+        run: gradle clean assembleRelease --no-daemon
 
       - name: Upload AAR
         uses: actions/upload-artifact@v4
