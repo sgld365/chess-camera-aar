@@ -1,13 +1,7 @@
 package io.dcloud.feature.uniapp.common;
 
-import android.content.Context;
-
 public class UniModule {
-    protected Context mUniSDKInstance;
-
-    public Context getContext() {
-        return mUniSDKInstance;
-    }
+    protected io.dcloud.feature.uniapp.UniSDKInstance mUniSDKInstance;
 
     public void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {}
     public void onActivityCreate() {}
