@@ -1,15 +1,12 @@
-     1|// DCloud uni-app SDK 编译期桩
-     2|
-     3|package io.dcloud.feature.uniapp.annotation;
-     4|
-     5|import java.lang.annotation.ElementType;
-     6|import java.lang.annotation.Retention;
-     7|import java.lang.annotation.RetentionPolicy;
-     8|import java.lang.annotation.Target;
-     9|
-    10|@Retention(RetentionPolicy.RUNTIME)
-    11|@Target(ElementType.METHOD)
-    12|public @interface UniJSMethod {
-    13|    boolean uiThread() default true;
-    14|}
-    15|
+package io.dcloud.feature.uniapp.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface UniJSMethod {
+    boolean uiThread() default true;
+}
