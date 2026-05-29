@@ -225,7 +225,7 @@ public class CameraActivity extends AppCompatActivity {
     private void openCameraInternal(int width, int height) {
         try {
             CameraManager manager = (CameraManager) getSystemService(CAMERA_SERVICE);
-            String cameraId = null;
+            final String cameraId = null;
 
             // 选后置摄像头
             for (String id : manager.getCameraIdList()) {
