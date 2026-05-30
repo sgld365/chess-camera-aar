@@ -28,39 +28,45 @@ public class ChessCameraModule extends UniModule {
      */
     @UniJSMethod(uiThread = true)
     public void openCamera(JSONObject options, UniJSCallback callback) {
-        if (mUniSDKInstance == null || mUniSDKInstance.getContext() == null) {
-            JSONObject err = new JSONObject();
-            err.put("code", -1);
-            err.put("message", "插件未就绪");
-            callback.invoke(err);
-            return;
-        }
-
-        sCallback = callback;
-
-        String overlayPath = options.getString("overlay_path");
-        double alpha = options.getDoubleValue("alpha");
-        if (alpha <= 0 || alpha > 1.0) alpha = 0.3;
-        String savePath = options.getString("save_path");
-
-        Log.d(TAG, "openCamera: overlay_image length=" + (overlayPath != null ? overlayPath.length() : 0)
-                + ", alpha=" + alpha + ", savePath=" + savePath);
-
-        Intent intent = new Intent(mUniSDKInstance.getContext(), CameraActivity.class);
-        intent.putExtra("overlay_image", overlayPath);
-        intent.putExtra("overlay_alpha", (float) alpha);
-        if (savePath != null) intent.putExtra("save_path", savePath);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
+            if (mUniSDKInstance == null || mUniSDKInstance.getContext() == null) {
+                JSONObject err = new JSONObject();
+                err.put("code", -1);
+                err.put("message", "插件未就绪");
+                callback.invoke(err);
+                return;
+            }
+
+            sCallback = callback;
+
+            String overlayPath = options.getString("overlay_path");
+            double alpha = options.getDoubleValue("alpha");
+            if (alpha <= 0 || alpha > 1.0) alpha = 0.3;
+            String savePath = options.getString("save_path");
+
+            Log.d(TAG, "openCamera: overlay len=" + (overlayPath != null ? overlayPath.length() : 0)
+                    + ", alpha=" + alpha + ", savePath=" + savePath);
+
+            Intent intent = new Intent(mUniSDKInstance.getContext(), CameraActivity.class);
+            Log.d(TAG, "Intent created, class found");
+            intent.putExtra("overlay_image", overlayPath);
+            intent.putExtra("overlay_alpha", (float) alpha);
+            if (savePath != null) intent.putExtra("save_path", savePath);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mUniSDKInstance.getContext().startActivity(intent);
-            Log.d(TAG, "startActivity succeeded");
+            Log.d(TAG, "startActivity succeeded, callback will fire from activity");
+            // ✅ Activity started successfully, callback will be invoked when user takes/cancels
         } catch (Throwable t) {
-            Log.e(TAG, "startActivity failed: " + t.getMessage(), t);
+            Log.e(TAG, "openCamera ERROR: " + t.getMessage(), t);
             JSONObject err = new JSONObject();
             err.put("code", -1);
-            err.put("message", "启动相机失败: " + t.getMessage());
-            sCallback.invoke(err);
-            sCallback = null;
+            err.put("message", "" + t.getClass().getSimpleName() + ": " + t.getMessage());
+            if (sCallback != null) {
+                try { sCallback.invoke(err); } catch (Throwable ignored) {}
+                sCallback = null;
+            } else if (callback != null) {
+                try { callback.invoke(err); } catch (Throwable ignored) {}
+            }
         }
     }
 }
