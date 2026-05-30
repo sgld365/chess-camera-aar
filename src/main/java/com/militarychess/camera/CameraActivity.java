@@ -256,8 +256,7 @@ public class CameraActivity extends AppCompatActivity {
                 return;
             }
 
-            // 获取预览尺寸
-            CameraCharacteristics chars = manager.getCameraCharacteristics(cameraId);
+            chars = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = chars.get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             if (map == null) {
@@ -265,6 +264,7 @@ public class CameraActivity extends AppCompatActivity {
                 return;
             }
             previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
+            if (previewSize == null) { finishWithError("无预览尺寸"); return; }
 
             // 创建 ImageReader（拍照用）
             Size[] jpegSizes = map.getOutputSizes(ImageFormat.JPEG);
@@ -273,6 +273,7 @@ public class CameraActivity extends AppCompatActivity {
             imageReader = ImageReader.newInstance(
                     captureSize.getWidth(), captureSize.getHeight(),
                     ImageFormat.JPEG, 2);
+            if (imageReader == null) { finishWithError("ImageReader创建失败"); return; }
             imageReader.setOnImageAvailableListener(reader -> {
                 if (isCapturing) return;
                 isCapturing = true;
@@ -351,16 +352,19 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     private void startPreview() {
-        if (cameraDevice == null || textureView == null) return;
+        if (cameraDevice == null) { finishWithError("startPreview: cameraDevice==null"); return; }
+        if (textureView == null) { finishWithError("startPreview: textureView==null"); return; }
+        if (previewSize == null) { finishWithError("startPreview: previewSize==null"); return; }
         try {
             SurfaceTexture surfaceTexture = textureView.getSurfaceTexture();
-            if (surfaceTexture == null) return;
+            if (surfaceTexture == null) { finishWithError("startPreview: surfaceTexture==null"); return; }
             surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
             Surface previewSurface = new Surface(surfaceTexture);
 
             previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             previewBuilder.addTarget(previewSurface);
 
+            if (imageReader == null) { finishWithError("startPreview: imageReader==null"); return; }
             cameraDevice.createCaptureSession(Arrays.asList(previewSurface, imageReader.getSurface()),
                     new CameraCaptureSession.StateCallback() {
                         @Override
