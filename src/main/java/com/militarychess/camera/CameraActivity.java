@@ -85,31 +85,43 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 读取参数
-        overlayB64 = getIntent().getStringExtra("overlay_image");
-        overlayAlpha = getIntent().getFloatExtra("overlay_alpha", 0.3f);
-        if (overlayAlpha <= 0 || overlayAlpha > 1.0f) overlayAlpha = 0.3f;
-        savePath = getIntent().getStringExtra("save_path");
-        if (savePath == null || savePath.isEmpty()) {
-            savePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                    + "/chess_camera_" + System.currentTimeMillis() + ".jpg";
+        try {
+            // 读取参数
+            overlayB64 = getIntent().getStringExtra("overlay_image");
+            overlayAlpha = getIntent().getFloatExtra("overlay_alpha", 0.3f);
+            if (overlayAlpha <= 0 || overlayAlpha > 1.0f) overlayAlpha = 0.3f;
+            savePath = getIntent().getStringExtra("save_path");
+            if (savePath == null || savePath.isEmpty()) {
+                savePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                        + "/chess_camera_" + System.currentTimeMillis() + ".jpg";
+            }
+
+            Log.d(TAG, "overlay len=" + (overlayB64 != null ? overlayB64.length() : 0)
+                    + ", alpha=" + overlayAlpha + ", savePath=" + savePath);
+
+            // 先显示界面
+            initUI();
+
+            // 检查权限
+            if (checkSelfPermission(Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                return;
+            }
+
+            openCamera();
+        } catch (Throwable t) {
+            Log.e(TAG, "onCreate error: " + t.getMessage(), t);
+            JSONObject ret = new JSONObject();
+            ret.put("code", -1);
+            ret.put("message", "相机异常: " + t.getClass().getSimpleName());
+            if (ChessCameraModule.sCallback != null) {
+                ChessCameraModule.sCallback.invoke(ret);
+                ChessCameraModule.sCallback = null;
+            }
+            finish();
         }
-
-        Log.d(TAG, "overlay len=" + (overlayB64 != null ? overlayB64.length() : 0)
-                + ", alpha=" + overlayAlpha + ", savePath=" + savePath);
-
-        // 先显示界面（权限还没给时也能看到按钮）
-        initUI();
-
-        // 检查权限
-        if (checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(
-                    new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-            return;
-        }
-
-        openCamera();
     }
 
     private void initUI() {
@@ -332,9 +344,9 @@ public class CameraActivity extends AppCompatActivity {
             }
         } catch (SecurityException e) {
             finishWithError("相机权限被拒绝");
-        } catch (Exception e) {
-            Log.e(TAG, "openCamera failed: " + e.getMessage(), e);
-            finishWithError("相机启动失败: " + e.getMessage());
+        } catch (Throwable t) {
+            Log.e(TAG, "openCamera failed: " + t.getMessage(), t);
+            finishWithError("相机异常: " + t.getClass().getSimpleName() + ": " + t.getMessage());
         }
     }
 
