@@ -54,11 +54,11 @@ public class ChessCameraModule extends UniModule {
         try {
             mUniSDKInstance.getContext().startActivity(intent);
             Log.d(TAG, "startActivity succeeded");
-        } catch (Exception e) {
-            Log.e(TAG, "startActivity failed: " + e.getMessage(), e);
+        } catch (Throwable t) {
+            Log.e(TAG, "startActivity failed: " + t.getMessage(), t);
             JSONObject err = new JSONObject();
             err.put("code", -1);
-            err.put("message", "启动相机失败: " + e.getMessage());
+            err.put("message", "启动相机失败: " + t.getMessage());
             sCallback.invoke(err);
             sCallback = null;
         }
