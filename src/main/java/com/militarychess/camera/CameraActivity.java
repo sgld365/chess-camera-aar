@@ -98,6 +98,9 @@ public class CameraActivity extends AppCompatActivity {
         Log.d(TAG, "overlay len=" + (overlayB64 != null ? overlayB64.length() : 0)
                 + ", alpha=" + overlayAlpha + ", savePath=" + savePath);
 
+        // 先显示界面（权限还没给时也能看到按钮）
+        initUI();
+
         // 检查权限
         if (checkSelfPermission(Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -106,7 +109,6 @@ public class CameraActivity extends AppCompatActivity {
             return;
         }
 
-        initUI();
         openCamera();
     }
 
