@@ -256,7 +256,7 @@ public class CameraActivity extends AppCompatActivity {
                 return;
             }
 
-            chars = manager.getCameraCharacteristics(cameraId);
+            CameraCharacteristics chars = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = chars.get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             if (map == null) {
